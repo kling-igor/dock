@@ -163,89 +163,88 @@ const renderDockPane = (title, component, offset = 0) => {
   )
 }
 
-export const DockView = withTheme(
-  observer(({ pages, currentPage }) => {
+export const DockView = observer(({ pages, currentPage }) => {
 
-    const page = pages[currentPage]
-    if (!page) {
-      console.error(`Dock page ${currentPage} not found`)
-      return null
-    }
+  const page = pages[currentPage]
+  if (!page) {
+    console.error(`Dock page ${currentPage} not found`)
+    return null
+  }
 
-    const { header, panes } = page
+  const { header, panes } = page
 
-    const count = panes.length
+  const count = panes.length
 
-    const sizes = []
-    const minSize = []
+  const sizes = []
+  const minSize = []
 
-    if (count >= 2) {
-      const size = 100 / count
+  if (count >= 2) {
+    const size = 100 / count
 
-      for (let i = 0; i < count; i++) {
-        sizes.push(size)
-        minSize.push(22)
-      }
-
-      return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
-          }}
-        >
-          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          <Split
-            style={{
-              height: '100%',
-              width: '100%',
-              overflow: 'auto'
-            }}
-            sizes={sizes}
-            minSize={minSize}
-            direction="vertical"
-            gutterSize={GUTTER_SIZE}
-          >
-            {panes.map(({ title, component }) => {
-              return <div key={title}>{renderDockPane(title, component)}</div>
-            })}
-          </Split>
-        </div>
-      )
-    }
-
-    if (count === 1) {
-      const [{ title, component }] = panes
-
-      return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#2c2c2c',
-            height: !header ? 'calc(100% - 35px)' : '100%',
-            width: '100%',
-            overflow: 'auto'
-          }}
-        >
-          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          {renderDockPane(title, component, 35)}
-        </div>
-      )
+    for (let i = 0; i < count; i++) {
+      sizes.push(size)
+      minSize.push(22)
     }
 
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#2c2c2c'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
+        }}
+      >
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+        <Split
+          style={{
+            height: '100%',
+            width: '100%',
+            overflow: 'auto'
+          }}
+          sizes={sizes}
+          minSize={minSize}
+          direction="vertical"
+          gutterSize={GUTTER_SIZE}
+        >
+          {panes.map(({ title, component }) => {
+            return <div key={title}>{renderDockPane(title, component)}</div>
+          })}
+        </Split>
       </div>
     )
-  })
-)
+  }
+
+  if (count === 1) {
+    const [{ title, component }] = panes
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#2c2c2c',
+          height: !header ? 'calc(100% - 35px)' : '100%',
+          width: '100%',
+          overflow: 'auto'
+        }}
+      >
+        {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+        {renderDockPane(title, component, 35)}
+      </div>
+    )
+  }
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: '#2c2c2c'
+    }}>
+      {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+    </div>
+  )
+})
+
 
 const TextStyle = styled.p`
   color: '#c3c3c3';

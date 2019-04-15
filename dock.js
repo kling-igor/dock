@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { observer } from 'mobx-react'
 import { DockView, OpenFolder, OutlineInfo, SearchInfo } from './dock-view'
 
@@ -7,6 +7,8 @@ export class Dock {
   @observable.ref _widget = null
 
   @observable.ref pages = {}
+
+  @observable currentPage = null
 
   // @action.bound addToTopPanel({ title, component }) {
   //   this.panels = [{ title, component }, ...this.panels]
@@ -43,10 +45,17 @@ export class Dock {
 
     this.currentPage = 'search'
 
-    this._widget = <DockView currentPage={this.currentPage} pages={this.pages} />
+    this._widget = observer(() => <DockView currentPage={this.currentPage} pages={this.pages} />)
   }
 
-  get widget() {
+  @action.bound
+  showPage(pageId) {
+    if (pageId in this.pages) {
+      this.currentPage = pageId
+    }
+  }
+
+  @computed get widget() {
     return this._widget
   }
 }

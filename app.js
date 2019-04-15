@@ -85,6 +85,9 @@ const dock = new Dock({ workspace })
 export default class App extends Component {
 
   render() {
+
+    const Dock = dock.widget
+
     return (
       <>
         <GlobalStyle />
@@ -105,9 +108,10 @@ export default class App extends Component {
             {/* <div style={{ height: '100%', backgroundColor: 'green' }}>
 
             </div> */}
-            {dock.widget}
+            <Dock />
             <div style={{ height: '100%', backgroundColor: 'magenta' }}>
-
+              <button onClick={() => dock.showPage('explorer')}>EXPOLORER</button>
+              <button onClick={() => dock.showPage('search')}>SEARCH</button>
             </div>
           </Split>
         </ThemeProvider>

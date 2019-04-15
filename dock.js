@@ -4,6 +4,8 @@ import { observer } from 'mobx-react'
 import { DockView, OpenFolder, OutlineInfo } from './dock-view'
 
 export class Dock {
+  @observable.ref _widget = null
+
   @observable.ref panels = []
 
   @action.bound addToTopPanel({ title, component }) {
@@ -21,12 +23,12 @@ export class Dock {
     // если только одна панель OUTLINE то добавить сверху дефолтную 'NO FOLDER OPENED'
   }
 
-  constructor({ workspace, project }) {
+  constructor({ workspace, project } = {}) {
     this.panels = [
-      // { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
-      // { title: 'OUTLINE', component: <OutlineInfo /> }
+      { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
+      { title: 'OUTLINE', component: <OutlineInfo /> }
     ]
-    this._widget = observer(() => <DockView header="EXPLORER" panels={this.panels} />)
+    this._widget = <DockView header="EXPLORER" panels={this.panels} />
   }
 
   get widget() {

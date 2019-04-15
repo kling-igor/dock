@@ -1,3 +1,5 @@
+import './app.css'
+
 import React, { Component } from "react";
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { observable } from 'mobx'
@@ -5,6 +7,8 @@ import { observer, Provider } from 'mobx-react'
 import Split from 'react-split'
 
 import dark from './dark'
+
+import { Dock } from './dock'
 
 const elementStyle = (dimension, size, gutterSize) => {
   return {
@@ -71,7 +75,13 @@ html {
   }
 `
 
+const workspace = {
+  openProject: () => { }
+}
 
+const dock = new Dock({ workspace })
+
+@observer
 export default class App extends Component {
 
   render() {
@@ -92,9 +102,10 @@ export default class App extends Component {
             elementStyle={elementStyle}
             gutterSize={2}
           >
-            <div style={{ height: '100%', backgroundColor: 'green' }}>
+            {/* <div style={{ height: '100%', backgroundColor: 'green' }}>
 
-            </div>
+            </div> */}
+            {dock.widget}
             <div style={{ height: '100%', backgroundColor: 'magenta' }}>
 
             </div>

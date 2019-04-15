@@ -199,7 +199,11 @@ export const DockView = withTheme(
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#2c2c2c' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#2c2c2c'
+      }}>
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
       </div>
     )

@@ -145,6 +145,15 @@ const withScrollBars = WrappedComponent => props => (
 
 const renderDockPane = (title, component, offset = 0) => {
   const ComponentWithScrollBars = withScrollBars(component)
+
+  if (!title) {
+    return (
+      <div key={"no_key"} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
+        <ComponentWithScrollBars />
+      </div>
+    )
+  }
+
   return (
     <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
       <DockPane title={title}>
@@ -163,8 +172,9 @@ export const DockView = withTheme(
       return null
     }
 
+    const { header, panes } = page
 
-    const count = page.panes.length
+    const count = panes.length
 
     const sizes = []
     const minSize = []
@@ -185,7 +195,7 @@ export const DockView = withTheme(
             height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
           }}
         >
-          {!!page.header && <DockHeaderStyle>{page.header}</DockHeaderStyle>}
+          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
           <Split
             style={{
               height: '100%',
@@ -197,7 +207,7 @@ export const DockView = withTheme(
             direction="vertical"
             gutterSize={GUTTER_SIZE}
           >
-            {page.panes.map(({ title, component }) => {
+            {panes.map(({ title, component }) => {
               return <div key={title}>{renderDockPane(title, component)}</div>
             })}
           </Split>
@@ -206,7 +216,7 @@ export const DockView = withTheme(
     }
 
     if (count === 1) {
-      const [{ title, component }] = panels
+      const [{ title, component }] = panes
 
       return (
         <div
@@ -271,6 +281,14 @@ export const OutlineInfo = () => (
   <ContainerStyle>
     <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
       There are no editors open that can provide outline information
+    </TextStyle>
+  </ContainerStyle>
+)
+
+export const SearchInfo = () => (
+  <ContainerStyle>
+    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
+      FAKE SEARCH INFO!!!
     </TextStyle>
   </ContainerStyle>
 )

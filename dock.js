@@ -1,7 +1,7 @@
 import React from 'react'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
-import { DockView, OpenFolder, OutlineInfo } from './dock-view'
+import { DockView, OpenFolder, OutlineInfo, SearchInfo } from './dock-view'
 
 export class Dock {
   @observable.ref _widget = null
@@ -31,10 +31,17 @@ export class Dock {
           { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
           { title: 'OUTLINE', component: <OutlineInfo /> }
         ]
+      },
+      search: {
+        header: "SEARCH",
+        panes: [
+          { component: <SearchInfo /> }
+        ]
       }
+
     }
 
-    this.currentPage = 'explorer'
+    this.currentPage = 'search'
 
     this._widget = <DockView currentPage={this.currentPage} pages={this.pages} />
   }

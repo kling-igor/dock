@@ -1,0 +1,2 @@
+https://medium.freecodecamp.org/functional-setstate-is-the-future-of-react-374f30401b6b
+https://medium.com/@WoTzap/%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-setstate-%D1%8D%D1%82%D0%BE-%D0%B1%D1%83%D0%B4%D1%83%D1%89%D0%B5%D0%B5-react-d262be6a6c02

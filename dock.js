@@ -6,29 +6,37 @@ import { DockView, OpenFolder, OutlineInfo } from './dock-view'
 export class Dock {
   @observable.ref _widget = null
 
-  @observable.ref panels = []
+  @observable.ref pages = {}
 
-  @action.bound addToTopPanel({ title, component }) {
-    this.panels = [{ title, component }, ...this.panels]
-  }
+  // @action.bound addToTopPanel({ title, component }) {
+  //   this.panels = [{ title, component }, ...this.panels]
+  // }
 
-  @action.bound addToBottomPanel({ title, component }) {
-    this.panels = [...this.panels, { title, component }]
-  }
+  // @action.bound addToBottomPanel({ title, component }) {
+  //   this.panels = [...this.panels, { title, component }]
+  // }
 
-  @action.bound removePanelWithName(name) {
-    this.panels = this.panels.filter(({ title }) => title !== name)
-    // TODO: если нет панели OUTLINE то добавить снизу дефолтную 'OUTLINE'
+  // @action.bound removePanelWithName(name) {
+  //   this.panels = this.panels.filter(({ title }) => title !== name)
+  //   // TODO: если нет панели OUTLINE то добавить снизу дефолтную 'OUTLINE'
 
-    // если только одна панель OUTLINE то добавить сверху дефолтную 'NO FOLDER OPENED'
-  }
+  //   // если только одна панель OUTLINE то добавить сверху дефолтную 'NO FOLDER OPENED'
+  // }
 
   constructor({ workspace, project } = {}) {
-    this.panels = [
-      { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
-      { title: 'OUTLINE', component: <OutlineInfo /> }
-    ]
-    this._widget = <DockView header="EXPLORER" panels={this.panels} />
+    this.pages = {
+      explorer: {
+        header: "EXPLORER",
+        panes: [
+          { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
+          { title: 'OUTLINE', component: <OutlineInfo /> }
+        ]
+      }
+    }
+
+    this.currentPage = 'explorer'
+
+    this._widget = <DockView currentPage={this.currentPage} pages={this.pages} />
   }
 
   get widget() {

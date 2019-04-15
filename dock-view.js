@@ -7,6 +7,9 @@ import { Button, Intent } from '@blueprintjs/core'
 
 const GUTTER_SIZE = 2
 
+/**
+ * Заголовок страницы дока
+ */
 const DockHeaderStyle = styled.div`
   -webkit-app-region: no-drag;
   -webkit-touch-callout: none;
@@ -35,6 +38,9 @@ const DockHeaderStyle = styled.div`
   color: #c3c3c3;
 `
 
+/**
+ * Заголовок секции страницы дока
+ */
 const DockPaneHeaderStyle = styled.div`
   -webkit-app-region: no-drag;
   -webkit-touch-callout: none;
@@ -62,6 +68,9 @@ const DockPaneHeaderStyle = styled.div`
   color: #c3c3c3;
 `
 
+/**
+ * Стрелка раскрытия секции страницы дока
+ */
 const DockHeaderArrowStyle = styled.span`
   color: ${({ theme: { type } }) => (type === 'dark' ? 'white' : 'black')};
   margin-right: 7px;
@@ -75,6 +84,9 @@ const DockHeaderArrowStyle = styled.span`
   }
 `
 
+/**
+ * Секция страницы дока
+ */
 const DockPaneStyle = styled.div`
   display: flex;
   flex-direction: column;
@@ -94,50 +106,65 @@ const DockPane = props => (
   </DockPaneStyle>
 )
 
-const renderDockPane = (title, component, offset = 0) => (
-  <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
-    <DockPane title={title}>
-      <Scrollbars
+const withScrollBars = WrappedComponent => props => (
+  <Scrollbars
+    style={{
+      width: '100%',
+      height: '100%',
+      background: '#1c1c1c',
+      overflow: 'hidden'
+    }}
+    autoHide={true}
+    autoHideTimeout={1000}
+    autoHideDuration={200}
+    thumbMinSize={30}
+    renderThumbHorizontal={({ style, ...props }) => (
+      <div
+        {...props}
         style={{
-          width: '100%',
-          height: '100%',
-          background: '#1c1c1c',
-          overflow: 'hidden'
+          ...style,
+          backgroundColor: '#424341',
+          borderRadius: '4px'
         }}
-        autoHide={true}
-        autoHideTimeout={1000}
-        autoHideDuration={200}
-        thumbMinSize={30}
-        renderThumbHorizontal={({ style, ...props }) => (
-          <div
-            {...props}
-            style={{
-              ...style,
-              backgroundColor: '#424341',
-              borderRadius: '4px'
-            }}
-          />
-        )}
-        renderThumbVertical={({ style, ...props }) => (
-          <div
-            {...props}
-            style={{
-              ...style,
-              backgroundColor: '#424341',
-              borderRadius: '4px'
-            }}
-          />
-        )}
-      >
-        {component}
-      </Scrollbars>
-    </DockPane>
-  </div>
+      />
+    )}
+    renderThumbVertical={({ style, ...props }) => (
+      <div
+        {...props}
+        style={{
+          ...style,
+          backgroundColor: '#424341',
+          borderRadius: '4px'
+        }}
+      />
+    )}
+  >
+    {WrappedComponent}
+  </Scrollbars>
 )
 
+const renderDockPane = (title, component, offset = 0) => {
+  const ComponentWithScrollBars = withScrollBars(component)
+  return (
+    <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
+      <DockPane title={title}>
+        <ComponentWithScrollBars />
+      </DockPane>
+    </div>
+  )
+}
+
 export const DockView = withTheme(
-  observer(({ panels, header }) => {
-    const count = panels.length
+  observer(({ pages, currentPage }) => {
+
+    const page = pages[currentPage]
+    if (!page) {
+      console.error(`Dock page ${currentPage} not found`)
+      return null
+    }
+
+
+    const count = page.panes.length
 
     const sizes = []
     const minSize = []
@@ -158,7 +185,7 @@ export const DockView = withTheme(
             height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
           }}
         >
-          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+          {!!page.header && <DockHeaderStyle>{page.header}</DockHeaderStyle>}
           <Split
             style={{
               height: '100%',
@@ -170,7 +197,7 @@ export const DockView = withTheme(
             direction="vertical"
             gutterSize={GUTTER_SIZE}
           >
-            {panels.map(({ title, component }) => {
+            {page.panes.map(({ title, component }) => {
               return <div key={title}>{renderDockPane(title, component)}</div>
             })}
           </Split>
@@ -212,6 +239,8 @@ export const DockView = withTheme(
 
 const TextStyle = styled.p`
   color: '#c3c3c3';
+  user-select: none;
+  pointer-events: none;
 `
 
 const ContainerStyle = styled.div`

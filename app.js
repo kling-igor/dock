@@ -1,7 +1,18 @@
 import React, { Component } from "react";
-import { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { observable } from 'mobx'
 import { observer, Provider } from 'mobx-react'
+import Split from 'react-split'
+
+import dark from './dark'
+
+const elementStyle = (dimension, size, gutterSize) => {
+  return {
+    'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)',
+    // float: "right",
+    width: size
+  }
+}
 
 const GlobalStyle = createGlobalStyle`
 
@@ -33,6 +44,31 @@ html {
 
     padding: 8px;
   }
+
+
+  /* разделитель */
+  .split {
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .gutter {
+      background-color: #414339; /*#ddd*/
+      background-repeat: no-repeat;
+      background-position: 50%;
+  }
+
+  .gutter.gutter-vertical {
+    /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAEAQMAAACEHZz0AAAABlBMVEUAAADMzMzIT8AyAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfjAhsTCQ6JxssVAAAAEUlEQVQI12NgYGA4cwaEGBgAEywDMZ7GenYAAAAASUVORK5CYII='); */
+    cursor: row-resize;
+  }
+  
+  .gutter.gutter-horizontal {
+    /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAOAQMAAAAypC9bAAAABlBMVEUAAADMzMzIT8AyAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfjAhsTCTE/oOYoAAAAEElEQVQI12NIYEhgAAEsNAAqHAMBffS2jgAAAABJRU5ErkJggg=='); */
+    cursor: col-resize;
+  }
 `
 
 
@@ -42,7 +78,28 @@ export default class App extends Component {
     return (
       <>
         <GlobalStyle />
-        <div>HELLO WORLD</div>
+        <ThemeProvider theme={dark}>
+          <Split
+            style={{
+              width: "100%",
+              height: "100%",
+              display: 'flex'
+            }}
+            sizes={[25, 75]}
+            minSize={[150, 500]}
+            snapOffset={0}
+            direction="horizontal"
+            elementStyle={elementStyle}
+            gutterSize={2}
+          >
+            <div style={{ height: '100%', backgroundColor: 'green' }}>
+
+            </div>
+            <div style={{ height: '100%', backgroundColor: 'magenta' }}>
+
+            </div>
+          </Split>
+        </ThemeProvider>
       </>
     )
   }

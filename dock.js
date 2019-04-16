@@ -28,24 +28,31 @@ export class Dock {
   constructor({ workspace, project } = {}) {
     this.pages = {
       explorer: {
-        header: "EXPLORER",
+        header: 'EXPLORER',
         panes: [
-          { title: 'NO FOLDER OPENED', component: <OpenFolder workspace={workspace} /> },
-          { title: 'OUTLINE', component: <OutlineInfo /> }
+          { title: 'NO FOLDER OPENED', elapsed: true, component: <OpenFolder workspace={workspace} /> },
+          { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> }
         ]
       },
       search: {
-        header: "SEARCH",
-        panes: [
-          { component: <SearchInfo /> }
-        ]
+        header: 'SEARCH',
+        panes: [{ component: <SearchInfo /> }]
       }
-
     }
 
     this.currentPage = 'search'
 
-    this._widget = observer(() => <DockView currentPage={this.currentPage} pages={this.pages} />)
+    this._widget = observer(() => (
+      <DockView currentPage={this.currentPage} pages={this.pages} onPaneHeaderClick={this.onPaneHeaderClick} />
+    ))
+  }
+
+  @action.bound
+  onPaneHeaderClick(page, index) {
+    console.log(`colapse/elapse '${page}' pane:`, index)
+    const pages = { ...this.pages }
+    pages[page].panes[index].elapsed = !pages[page].panes[index].elapsed
+    this.pages = pages
   }
 
   @action.bound

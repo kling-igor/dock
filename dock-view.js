@@ -42,10 +42,7 @@ const DockHeaderStyle = styled.div`
  * Заголовок секции страницы дока
  */
 const DockPaneHeaderStyle = styled.div`
-  -webkit-app-region: no-drag;
-  -webkit-touch-callout: none;
   user-select: none;
-  pointer-events: none;
 
   overflow: hidden;
 
@@ -76,7 +73,7 @@ const DockHeaderArrowStyle = styled.span`
   margin-right: 7px;
   margin-left: 7px;
   display: inline-block;
-  transform: ${({ ellapsed }) => (ellapsed ? 'rotate(-45deg)' : 'rotate(-90deg)')};
+  transform: ${({ elapsed }) => (elapsed ? 'rotate(-45deg)' : 'rotate(-90deg)')};
   transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
 
   ::after {
@@ -98,11 +95,11 @@ const DockPaneStyle = styled.div`
 
 const DockPane = props => (
   <DockPaneStyle className="bp3-dark">
-    <DockPaneHeaderStyle>
-      <DockHeaderArrowStyle />
+    <DockPaneHeaderStyle onClick={props.onHeaderClick}>
+      <DockHeaderArrowStyle elapsed={props.elapsed} />
       {props.title}
     </DockPaneHeaderStyle>
-    {React.Children.only(props.children)}
+    {props.children}
   </DockPaneStyle>
 )
 
@@ -143,28 +140,31 @@ const withScrollBars = WrappedComponent => props => (
   </Scrollbars>
 )
 
-const renderDockPane = (title, component, offset = 0) => {
+const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick) => {
   const ComponentWithScrollBars = withScrollBars(component)
 
   if (!title) {
     return (
-      <div key={"no_key"} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
+      <div key={'no_key'} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
         <ComponentWithScrollBars />
       </div>
     )
   }
 
+  if (!elapsed) {
+    return <DockPane title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} />
+  }
+
   return (
     <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
-      <DockPane title={title}>
+      <DockPane title={title} elapsed={true} onHeaderClick={handlePaneHeaderClick}>
         <ComponentWithScrollBars />
       </DockPane>
     </div>
   )
 }
 
-export const DockView = observer(({ pages, currentPage }) => {
-
+export const DockView = observer(({ pages, currentPage, onPaneHeaderClick }) => {
   const page = pages[currentPage]
   if (!page) {
     console.error(`Dock page ${currentPage} not found`)
@@ -178,12 +178,19 @@ export const DockView = observer(({ pages, currentPage }) => {
   const sizes = []
   const minSize = []
 
+  const handlePaneHeaderClick = index => () => {
+    onPaneHeaderClick(currentPage, index)
+  }
+
   if (count >= 2) {
-    const size = 100 / count
+    const averageSize = 100 / count
 
     for (let i = 0; i < count; i++) {
+      const min = panes[i].elapsed ? 142 : 22
+      const size = panes[i].elapsed ? averageSize : 22
+
       sizes.push(size)
-      minSize.push(22)
+      minSize.push(min) // 22
     }
 
     return (
@@ -206,8 +213,8 @@ export const DockView = observer(({ pages, currentPage }) => {
           direction="vertical"
           gutterSize={GUTTER_SIZE}
         >
-          {panes.map(({ title, component }) => {
-            return <div key={title}>{renderDockPane(title, component)}</div>
+          {panes.map(({ title, component, elapsed }, i) => {
+            return <div key={title}>{renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}</div>
           })}
         </Split>
       </div>
@@ -215,7 +222,7 @@ export const DockView = observer(({ pages, currentPage }) => {
   }
 
   if (count === 1) {
-    const [{ title, component }] = panes
+    const [{ title, component, elapsed }] = panes
 
     return (
       <div
@@ -229,22 +236,23 @@ export const DockView = observer(({ pages, currentPage }) => {
         }}
       >
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        {renderDockPane(title, component, 35)}
+        {renderDockPane(title, component, elapsed, 35 /*offset*/, handlePaneHeaderClick(0))}
       </div>
     )
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: '#2c2c2c'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#2c2c2c'
+      }}
+    >
       {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
     </div>
   )
 })
-
 
 const TextStyle = styled.p`
   color: '#c3c3c3';
@@ -279,15 +287,13 @@ export const OpenFolder = ({ workspace }) => (
 export const OutlineInfo = () => (
   <ContainerStyle>
     <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
-      There are no editors open that can provide outline information
+      There are no editors open that can provide outline information.
     </TextStyle>
   </ContainerStyle>
 )
 
 export const SearchInfo = () => (
   <ContainerStyle>
-    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
-      FAKE SEARCH INFO!!!
-    </TextStyle>
+    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">FAKE SEARCH INFO!!!</TextStyle>
   </ContainerStyle>
 )

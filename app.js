@@ -1,6 +1,6 @@
 import './app.css'
 
-import React, { Component } from "react";
+import React, { Component } from 'react'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { observable } from 'mobx'
 import { observer, Provider } from 'mobx-react'
@@ -76,16 +76,14 @@ html {
 `
 
 const workspace = {
-  openProject: () => { }
+  openProject: () => {}
 }
 
 const dock = new Dock({ workspace })
 
 @observer
 export default class App extends Component {
-
   render() {
-
     const Dock = dock.widget
 
     return (
@@ -94,8 +92,8 @@ export default class App extends Component {
         <ThemeProvider theme={dark}>
           <Split
             style={{
-              width: "100%",
-              height: "100%",
+              width: '100%',
+              height: '100%',
               display: 'flex'
             }}
             sizes={[25, 75]}
@@ -109,7 +107,7 @@ export default class App extends Component {
 
             </div> */}
             <Dock />
-            <div style={{ height: '100%', backgroundColor: 'magenta' }}>
+            <div style={{ height: '100%', backgroundColor: '#343434' }}>
               <button onClick={() => dock.showPage('explorer')}>EXPOLORER</button>
               <button onClick={() => dock.showPage('search')}>SEARCH</button>
             </div>
@@ -118,4 +116,4 @@ export default class App extends Component {
       </>
     )
   }
-}  
+}

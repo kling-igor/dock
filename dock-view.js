@@ -7,7 +7,17 @@ import { Scrollbars } from 'react-custom-scrollbars'
 import { observer } from 'mobx-react'
 import { Button, Intent } from '@blueprintjs/core'
 
-const GUTTER_SIZE = 2
+/**
+ * Контейнер дока
+ */
+const DockStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%; /*!!header ? 'calc(100% - 35px)' : '100%',*/
+  background-color: #2c2c2c;
+  overflow: auto;
+`
 
 /**
  * Заголовок страницы дока
@@ -89,14 +99,13 @@ const DockHeaderArrowStyle = styled.span`
 const DockPaneStyle = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: ${({ elapsed }) => (elapsed ? '100%' : '22px')};
   width: 100%;
-
-  overflow: auto;
+  overflow: ${({ elapsed }) => (elapsed ? 'auto' : 'hidden')};
 `
 
 const DockPane = props => (
-  <DockPaneStyle className="bp3-dark">
+  <DockPaneStyle className="bp3-dark" elapsed={props.elapsed}>
     <DockPaneHeaderStyle onClick={props.onHeaderClick}>
       <DockHeaderArrowStyle elapsed={props.elapsed} />
       {props.title}
@@ -153,8 +162,8 @@ const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderC
     )
   }
 
-  if (!elapsed) {
-    return <DockPane title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} />
+  if (elapsed === false) {
+    return <DockPane key={title} title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} />
   }
 
   return (
@@ -187,69 +196,58 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
   if (count >= 2) {
     const sizes = paneSizes[currentPage]
 
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
-        }}
-      >
-        {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        <SplitPane
-          split="horizontal"
-          allowResize={true}
-          resizerSize={1}
-          onResizeEnd={data => onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))}
-        >
-          {panes.map(({ title, component, elapsed }, i) => {
-            const minSize = elapsed ? '144' : '22'
-            const maxSize = elapsed ? undefined : '22'
-            const initialSize = sizes[i] == null ? minSize : sizes[i]
+    const elapsedPanesCount = panes.reduce((accum, { elapsed }) => (elapsed ? accum + 1 : accum), 0)
 
-            return (
-              <Pane key={title} initialSize={initialSize} minSize={minSize} maxSize={maxSize}>
-                {renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}
-              </Pane>
-            )
-          })}
-        </SplitPane>
-      </div>
-    )
+    if (elapsedPanesCount >= 2) {
+      return (
+        <DockStyle>
+          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+          <SplitPane
+            split="horizontal"
+            allowResize={true}
+            resizerSize={1}
+            onResizeEnd={data => onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))}
+          >
+            {panes.map(({ title, component, elapsed }, i) => {
+              if (elapsed === false) {
+                return renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))
+              }
+
+              const initialSize = sizes[i] == null ? '144px' : sizes[i]
+
+              return (
+                <Pane key={title} initialSize={initialSize} minSize="144px" maxSize="100%">
+                  {renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}
+                </Pane>
+              )
+            })}
+          </SplitPane>
+        </DockStyle>
+      )
+    } else {
+      return (
+        <DockStyle>
+          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+          {panes.map(({ title, component, elapsed }, i) =>
+            renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))
+          )}
+        </DockStyle>
+      )
+    }
   }
 
   if (count === 1) {
     const [{ title, component, elapsed }] = panes
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: '#2c2c2c',
-          height: !header ? 'calc(100% - 35px)' : '100%',
-          width: '100%',
-          overflow: 'auto'
-        }}
-      >
+      <DockStyle>
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
         {renderDockPane(title, component, elapsed, 35 /*offset*/, handlePaneHeaderClick(0))}
-      </div>
+      </DockStyle>
     )
   }
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#2c2c2c'
-      }}
-    >
-      {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-    </div>
-  )
+  return <DockStyle>{!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}</DockStyle>
 })
 
 const TextStyle = styled.p`

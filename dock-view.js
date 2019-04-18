@@ -184,40 +184,65 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
 
   const { header, panes } = page
 
-  const count = panes.length
+  const panesCount = panes.length
 
-  const sizes = []
-  const minSize = []
-
-  const handlePaneHeaderClick = index => () => {
+  const makePaneHeaderClickHandler = index => () => {
     onPaneHeaderClick(currentPage, index)
   }
 
-  if (count >= 2) {
-    const sizes = paneSizes[currentPage]
+  const handleResizeEnd = data => {
+    onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))
+  }
+
+  if (panesCount >= 2) {
+    // если меняется состав открытых\закрытых панелей, то сохраненные значения могут быть нерелевантны
+    // как минимум стоит их тоже занулить если открывается/закрывается какая-то панель!!!
 
     const elapsedPanesCount = panes.reduce((accum, { elapsed }) => (elapsed ? accum + 1 : accum), 0)
 
     if (elapsedPanesCount >= 2) {
+      let sizes = paneSizes[currentPage].slice()
+
+      // если размеры не определены
+      if (sizes.length === 0) {
+        let firstFoundElapsedPaneIndex = -1
+
+        // формируем дефолтные
+        sizes = panes.map(({ elapsed }, i) => {
+          if (elapsed && firstFoundElapsedPaneIndex === -1) {
+            firstFoundElapsedPaneIndex = i
+          }
+
+          if (elapsed) return '144px'
+
+          return '22px'
+        })
+
+        // для первой открытой панели выставляем 100%
+        if (firstFoundElapsedPaneIndex !== -1) {
+          sizes[firstFoundElapsedPaneIndex] = '100%'
+        }
+      }
+
       return (
         <DockStyle>
           {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          <SplitPane
-            split="horizontal"
-            allowResize={true}
-            resizerSize={1}
-            onResizeEnd={data => onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))}
-          >
+          <SplitPane split="horizontal" allowResize={true} resizerSize={1} onResizeEnd={handleResizeEnd}>
             {panes.map(({ title, component, elapsed }, i) => {
               if (elapsed === false) {
-                return renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))
+                // return renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
+                return (
+                  <Pane key={title} initialSize="22px" minSize="22px" maxSize="22px">
+                    {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))}
+                  </Pane>
+                )
               }
 
-              const initialSize = sizes[i] == null ? '144px' : sizes[i]
+              // const initialSize = sizes[i] == null ? '144px' : sizes[i]
 
               return (
-                <Pane key={title} initialSize={initialSize} minSize="144px" maxSize="100%">
-                  {renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}
+                <Pane key={title} initialSize={sizes[i]} minSize="144px" maxSize="100%">
+                  {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))}
                 </Pane>
               )
             })}
@@ -229,20 +254,20 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
         <DockStyle>
           {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
           {panes.map(({ title, component, elapsed }, i) =>
-            renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))
+            renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
           )}
         </DockStyle>
       )
     }
   }
 
-  if (count === 1) {
+  if (panesCount === 1) {
     const [{ title, component, elapsed }] = panes
 
     return (
       <DockStyle>
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        {renderDockPane(title, component, elapsed, 35 /*offset*/, handlePaneHeaderClick(0))}
+        {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0))}
       </DockStyle>
     )
   }

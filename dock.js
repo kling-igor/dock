@@ -34,7 +34,8 @@ export class Dock {
         header: 'EXPLORER',
         panes: [
           { title: 'NO FOLDER OPENED', elapsed: true, component: <OpenFolder workspace={workspace} /> },
-          { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> }
+          { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> },
+          { title: 'VARIABLES', elapsed: true, component: <div>HELLO</div> }
         ]
       },
       search: {
@@ -67,10 +68,12 @@ export class Dock {
 
   @action.bound
   onPaneHeaderClick(page, index) {
-    console.log(`colapse/elapse '${page}' pane:`, index)
     const pages = { ...this.pages }
     pages[page].panes[index].elapsed = !pages[page].panes[index].elapsed
     this.pages = pages
+
+    // удаляем ранее сохраненные размеры!!!
+    this.paneSizes[page] = []
   }
 
   @action.bound

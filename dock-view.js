@@ -1,6 +1,8 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
-import Split from 'react-split'
+// import Split from 'react-split'
+import SplitPane, { Pane } from './react-split'
+
 import { Scrollbars } from 'react-custom-scrollbars'
 import { observer } from 'mobx-react'
 import { Button, Intent } from '@blueprintjs/core'
@@ -198,25 +200,37 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick }) => 
         style={{
           display: 'flex',
           flexDirection: 'column',
+          width: '100%',
           height: '100%' /*!!header ? 'calc(100% - 35px)' : '100%',*/
         }}
       >
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        <Split
-          style={{
-            height: '100%',
-            width: '100%',
-            overflow: 'auto'
-          }}
-          sizes={sizes}
-          minSize={minSize}
-          direction="vertical"
-          gutterSize={GUTTER_SIZE}
+        <SplitPane
+          split="horizontal"
+          allowResize={true}
+          resizerSize={1}
+          // style={{
+          //   height: '100%',
+          //   width: '100%',
+          //   overflow: 'auto'
+          // }}
+          // sizes={sizes}
+          // minSize={minSize}
+          // direction="vertical"
+          // gutterSize={GUTTER_SIZE}
         >
           {panes.map(({ title, component, elapsed }, i) => {
-            return <div key={title}>{renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}</div>
+            //  <Pane initialSize="200px" minSize="200px" maxSize="500px">
+            const minSize = elapsed ? '144' : '22'
+            const maxSize = elapsed ? undefined : '22'
+
+            return (
+              <Pane key={title} initialSize={minSize} minSize={minSize} maxSize={maxSize}>
+                {renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}
+              </Pane>
+            )
           })}
-        </Split>
+        </SplitPane>
       </div>
     )
   }

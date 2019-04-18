@@ -166,7 +166,7 @@ const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderC
   )
 }
 
-export const DockView = observer(({ pages, currentPage, onPaneHeaderClick }) => {
+export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onResizeEnd, paneSizes }) => {
   const page = pages[currentPage]
   if (!page) {
     console.error(`Dock page ${currentPage} not found`)
@@ -185,15 +185,7 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick }) => 
   }
 
   if (count >= 2) {
-    const averageSize = 100 / count
-
-    for (let i = 0; i < count; i++) {
-      const min = panes[i].elapsed ? 142 : 22
-      const size = panes[i].elapsed ? averageSize : 22
-
-      sizes.push(size)
-      minSize.push(min) // 22
-    }
+    const sizes = paneSizes[currentPage]
 
     return (
       <div
@@ -209,23 +201,15 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick }) => 
           split="horizontal"
           allowResize={true}
           resizerSize={1}
-          // style={{
-          //   height: '100%',
-          //   width: '100%',
-          //   overflow: 'auto'
-          // }}
-          // sizes={sizes}
-          // minSize={minSize}
-          // direction="vertical"
-          // gutterSize={GUTTER_SIZE}
+          onResizeEnd={data => onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))}
         >
           {panes.map(({ title, component, elapsed }, i) => {
-            //  <Pane initialSize="200px" minSize="200px" maxSize="500px">
             const minSize = elapsed ? '144' : '22'
             const maxSize = elapsed ? undefined : '22'
+            const initialSize = sizes[i] == null ? minSize : sizes[i]
 
             return (
-              <Pane key={title} initialSize={minSize} minSize={minSize} maxSize={maxSize}>
+              <Pane key={title} initialSize={initialSize} minSize={minSize} maxSize={maxSize}>
                 {renderDockPane(title, component, elapsed, 0, handlePaneHeaderClick(i))}
               </Pane>
             )

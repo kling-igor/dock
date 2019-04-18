@@ -10,6 +10,9 @@ export class Dock {
 
   @observable currentPage = null
 
+  // для каждой страницы для каждого раздела страницы сохраняются размеры
+  paneSizes = {}
+
   // @action.bound addToTopPanel({ title, component }) {
   //   this.panels = [{ title, component }, ...this.panels]
   // }
@@ -40,11 +43,26 @@ export class Dock {
       }
     }
 
+    this.paneSizes = {
+      explorer: [],
+      search: []
+    }
+
     this.currentPage = 'search'
 
     this._widget = observer(() => (
-      <DockView currentPage={this.currentPage} pages={this.pages} onPaneHeaderClick={this.onPaneHeaderClick} />
+      <DockView
+        currentPage={this.currentPage}
+        pages={this.pages}
+        paneSizes={this.paneSizes}
+        onPaneHeaderClick={this.onPaneHeaderClick}
+        onResizeEnd={this.onResizeEnd}
+      />
     ))
+  }
+
+  onResizeEnd = (pageId, sizes) => {
+    this.paneSizes[pageId] = sizes
   }
 
   @action.bound

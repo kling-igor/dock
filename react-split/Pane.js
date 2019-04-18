@@ -1,8 +1,4 @@
 import React, { PureComponent } from 'react'
-// import PropTypes from 'prop-types';
-
-// import prefixAll from 'inline-style-prefixer/static';
-
 import { getUnit, convertSizeToCssValue } from './SplitPane'
 
 function PaneStyle({ split = 'vertical', initialSize = '1', size, minSize = '0', maxSize = '100%', resizersSize }) {
@@ -59,13 +55,6 @@ class Pane extends PureComponent {
 //   initialSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 //   minSize: PropTypes.string,
 //   maxSize: PropTypes.string,
-// };
-
-// Pane.defaultProps = {
-//   initialSize: '1',
-//   split: 'vertical',
-//   minSize: '0',
-//   maxSize: '100%',
 // };
 
 export default Pane

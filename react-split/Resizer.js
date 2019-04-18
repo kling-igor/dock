@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
+import React, { Component } from 'react'
+import styled from 'styled-components'
 
 const Wrapper = styled.div`
   background: #000;
@@ -12,7 +12,7 @@ const Wrapper = styled.div`
     opacity: 0.5;
     transition: all 2s ease;
   }
-`;
+`
 
 const HorizontalWrapper = styled(Wrapper)`
   height: 11px;
@@ -33,7 +33,7 @@ const HorizontalWrapper = styled(Wrapper)`
   .disabled:hover {
     border-color: transparent;
   }
-`;
+`
 
 const VerticalWrapper = styled(Wrapper)`
   width: 11px;
@@ -52,53 +52,49 @@ const VerticalWrapper = styled(Wrapper)`
   .disabled:hover {
     border-color: transparent;
   }
-`;
+`
 
 class Resizer extends Component {
   render() {
     const {
       index,
       split = 'vertical',
-      onClick = () => { },
-      onDoubleClick = () => { },
-      onMouseDown = () => { },
-      onTouchEnd = () => { },
-      onTouchStart = () => { },
-    } = this.props;
+      onClick = () => {},
+      onDoubleClick = () => {},
+      onMouseDown = () => {},
+      onTouchEnd = () => {},
+      onTouchStart = () => {}
+    } = this.props
 
     const props = {
-      ref: _ => (this.resizer = _),
-      'data-attribute': split,
-      'data-type': 'Resizer',
+      ref: _ => {
+        this.resizer = _
+      },
       onMouseDown: event => onMouseDown(event, index),
       onTouchStart: event => {
-        event.preventDefault();
-        onTouchStart(event, index);
+        event.preventDefault()
+        onTouchStart(event, index)
       },
       onTouchEnd: event => {
-        event.preventDefault();
-        onTouchEnd(event, index);
+        event.preventDefault()
+        onTouchEnd(event, index)
       },
       onClick: event => {
         if (onClick) {
-          event.preventDefault();
-          onClick(event, index);
+          event.preventDefault()
+          onClick(event, index)
         }
       },
       onDoubleClick: event => {
         if (onDoubleClick) {
-          event.preventDefault();
-          onDoubleClick(event, index);
+          event.preventDefault()
+          onDoubleClick(event, index)
         }
-      },
-    };
+      }
+    }
 
-    return split === 'vertical' ? (
-      <VerticalWrapper {...props} />
-    ) : (
-        <HorizontalWrapper {...props} />
-      );
+    return split === 'vertical' ? <VerticalWrapper {...props} /> : <HorizontalWrapper {...props} />
   }
 }
 
-export default Resizer;
+export default Resizer

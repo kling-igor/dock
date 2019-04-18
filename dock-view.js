@@ -104,13 +104,13 @@ const DockPaneStyle = styled.div`
   overflow: ${({ elapsed }) => (elapsed ? 'auto' : 'hidden')};
 `
 
-const DockPane = props => (
-  <DockPaneStyle className="bp3-dark" elapsed={props.elapsed}>
-    <DockPaneHeaderStyle onClick={props.onHeaderClick}>
-      <DockHeaderArrowStyle elapsed={props.elapsed} />
-      {props.title}
+const DockPane = ({ theme, elapsed, onHeaderClick, title, children }) => (
+  <DockPaneStyle className={theme.type === 'dark' ? 'bp3-dark' : ''} elapsed={elapsed}>
+    <DockPaneHeaderStyle onClick={onHeaderClick}>
+      <DockHeaderArrowStyle elapsed={elapsed} theme={theme} />
+      {title}
     </DockPaneHeaderStyle>
-    {props.children}
+    {children}
   </DockPaneStyle>
 )
 
@@ -151,7 +151,7 @@ const withScrollBars = WrappedComponent => props => (
   </Scrollbars>
 )
 
-const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick) => {
+const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick, theme) => {
   const ComponentWithScrollBars = withScrollBars(component)
 
   if (!title) {
@@ -163,19 +163,19 @@ const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderC
   }
 
   if (elapsed === false) {
-    return <DockPane key={title} title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} />
+    return <DockPane key={title} title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} theme={theme} />
   }
 
   return (
     <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
-      <DockPane title={title} elapsed={true} onHeaderClick={handlePaneHeaderClick}>
+      <DockPane title={title} elapsed={true} onHeaderClick={handlePaneHeaderClick} theme={theme}>
         <ComponentWithScrollBars />
       </DockPane>
     </div>
   )
 }
 
-export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onResizeEnd, paneSizes }) => {
+export const DockView = withTheme(observer(({ pages, currentPage, onPaneHeaderClick, onResizeEnd, paneSizes, theme }) => {
   const page = pages[currentPage]
   if (!page) {
     console.error(`Dock page ${currentPage} not found`)
@@ -233,7 +233,7 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
                 // return renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
                 return (
                   <Pane key={title} initialSize="22px" minSize="22px" maxSize="22px">
-                    {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))}
+                    {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
                   </Pane>
                 )
               }
@@ -242,7 +242,7 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
 
               return (
                 <Pane key={title} initialSize={sizes[i]} minSize="144px" maxSize="100%">
-                  {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))}
+                  {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
                 </Pane>
               )
             })}
@@ -254,7 +254,7 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
         <DockStyle>
           {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
           {panes.map(({ title, component, elapsed }, i) =>
-            renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
+            renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)
           )}
         </DockStyle>
       )
@@ -267,13 +267,13 @@ export const DockView = observer(({ pages, currentPage, onPaneHeaderClick, onRes
     return (
       <DockStyle>
         {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0))}
+        {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0), theme)}
       </DockStyle>
     )
   }
 
   return <DockStyle>{!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}</DockStyle>
-})
+}))
 
 const TextStyle = styled.p`
   color: '#c3c3c3';
@@ -291,7 +291,7 @@ const ContainerStyle = styled.div`
   margin-top: 16px;
 `
 
-export const OpenFolder = ({ workspace }) => (
+export const OpenFolder = withTheme(({ workspace }) => (
   <ContainerStyle>
     <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">You have not yet opened a folder</TextStyle>
     <Button
@@ -303,18 +303,18 @@ export const OpenFolder = ({ workspace }) => (
       Open Folder
     </Button>
   </ContainerStyle>
-)
+))
 
-export const OutlineInfo = () => (
+export const OutlineInfo = withTheme(() => (
   <ContainerStyle>
     <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
       There are no editors open that can provide outline information.
     </TextStyle>
   </ContainerStyle>
-)
+))
 
-export const SearchInfo = () => (
+export const SearchInfo = withTheme(() => (
   <ContainerStyle>
     <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">FAKE SEARCH INFO!!!</TextStyle>
   </ContainerStyle>
-)
+))

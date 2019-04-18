@@ -7,6 +7,7 @@ import { observer, Provider } from 'mobx-react'
 import SplitPane, { Pane } from './react-split'
 
 import dark from './dark'
+import light from './light'
 
 import { Dock } from './dock'
 
@@ -48,35 +49,10 @@ html {
 
     padding: 8px;
   }
-
-
-  /* разделитель
-  .split {
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: row;
-  }
-
-  .gutter {
-      background-color: #414339; /*#ddd*/
-      background-repeat: no-repeat;
-      background-position: 50%;
-  }
-
-  .gutter.gutter-vertical {
-    /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAEAQMAAACEHZz0AAAABlBMVEUAAADMzMzIT8AyAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfjAhsTCQ6JxssVAAAAEUlEQVQI12NgYGA4cwaEGBgAEywDMZ7GenYAAAAASUVORK5CYII='); */
-    cursor: row-resize;
-  }
-  
-  .gutter.gutter-horizontal {
-    /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAOAQMAAAAypC9bAAAABlBMVEUAAADMzMzIT8AyAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfjAhsTCTE/oOYoAAAAEElEQVQI12NIYEhgAAEsNAAqHAMBffS2jgAAAABJRU5ErkJggg=='); */
-    cursor: col-resize;
-  } */
 `
 
 const workspace = {
-  openProject: () => {}
+  openProject: () => { }
 }
 
 const dock = new Dock({ workspace })
@@ -87,9 +63,9 @@ export default class App extends Component {
     const Dock = dock.widget
 
     return (
-      <>
-        <GlobalStyle />
-        <ThemeProvider theme={dark}>
+      <ThemeProvider theme={light}>
+        <>
+          <GlobalStyle />
           <SplitPane split="vertical" allowResize={true} resizerSize={1}>
             <Pane initialSize="10%" minSize="200px" maxSize="350px">
               <Dock />
@@ -101,8 +77,8 @@ export default class App extends Component {
               </div>
             </Pane>
           </SplitPane>
-        </ThemeProvider>
-      </>
+        </>
+      </ThemeProvider>
     )
   }
 }

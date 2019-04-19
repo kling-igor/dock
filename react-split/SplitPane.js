@@ -335,7 +335,11 @@ class SplitPane extends Component {
   }
 
   getResizersSize(children) {
-    return (children.length - 1) * (this.props.resizerSize || 1)
+    if (this.props.resizerSize == null) {
+      return 0
+    }
+
+    return (children.length - 1) * this.props.resizerSize
   }
 
   render() {

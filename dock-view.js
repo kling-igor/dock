@@ -15,8 +15,27 @@ const DockStyle = styled.div`
   flex-direction: column;
   width: 100%;
   height: 100%; /*!!header ? 'calc(100% - 35px)' : '100%',*/
-  background-color: #2c2c2c;
+  background-color: ${({
+    theme: {
+      sideBar: { background }
+    }
+  }) => (background ? background : '#f0f')};
   overflow: auto;
+  border-right-color: ${({
+    theme: {
+      sideBar: { border, background }
+    }
+  }) => (border ? border : background)};
+  border-right-style: ${({
+    theme: {
+      sideBar: { border }
+    }
+  }) => (border ? 'solid' : 'none')};
+  border-right-width: ${({
+    theme: {
+      sideBar: { border }
+    }
+  }) => (border ? '1px' : '0px')};
 `
 
 /**
@@ -43,11 +62,19 @@ const DockHeaderStyle = styled.div`
   justify-content: flex-start; /*space-between; */
   align-items: center;
 
-  background-color: #1c1c1c;
+  background-color: ${({
+    theme: {
+      sideBar: { background }
+    }
+  }) => (background ? background : '#f00')};
   font-size: 11px;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 0px;
-  color: #c3c3c3;
+  color: ${({
+    theme: {
+      sideBarTitle: { foreground }
+    }
+  }) => foreground || '#ffff00'};
 `
 
 /**
@@ -69,19 +96,31 @@ const DockPaneHeaderStyle = styled.div`
   justify-content: flex-start; /*space-between; */
   align-items: center;
 
-  background-color: #393939;
+  background-color: ${({
+    theme: {
+      sideBarSectionHeader: { background }
+    }
+  }) => background || '#ff00ff'};
   font-size: 11px;
   font-weight: bold;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 0px;
-  color: #c3c3c3;
+  color: ${({
+    theme: {
+      sideBarSectionHeader: { foreground }
+    }
+  }) => foreground || '#ffff00'};
 `
 
 /**
  * Стрелка раскрытия секции страницы дока
  */
 const DockHeaderArrowStyle = styled.span`
-  color: ${({ theme: { type } }) => (type === 'dark' ? 'white' : 'black')};
+  color: ${({
+    theme: {
+      sideBar: { foreground }
+    }
+  }) => foreground || '#00ffff'};
   margin-right: 7px;
   margin-left: 7px;
   display: inline-block;
@@ -114,42 +153,35 @@ const DockPane = ({ theme, elapsed, onHeaderClick, title, children }) => (
   </DockPaneStyle>
 )
 
-const withScrollBars = WrappedComponent => props => (
-  <Scrollbars
-    style={{
-      width: '100%',
-      height: '100%',
-      background: '#1c1c1c',
-      overflow: 'hidden'
-    }}
-    autoHide={true}
-    autoHideTimeout={1000}
-    autoHideDuration={200}
-    thumbMinSize={30}
-    renderThumbHorizontal={({ style, ...props }) => (
-      <div
-        {...props}
-        style={{
-          ...style,
-          backgroundColor: '#424341',
-          borderRadius: '4px'
-        }}
-      />
-    )}
-    renderThumbVertical={({ style, ...props }) => (
-      <div
-        {...props}
-        style={{
-          ...style,
-          backgroundColor: '#424341',
-          borderRadius: '4px'
-        }}
-      />
-    )}
-  >
-    {WrappedComponent}
-  </Scrollbars>
-)
+const ContainerWithScrollbarsStyle = styled(Scrollbars)`
+  width: 100%;
+  height: 100%;
+  background: ${({
+    theme: {
+      sideBar: { background }
+    }
+  }) => background};
+  overflow: hidden;
+`
+
+const ScrollBarThumbStyle = styled.div`
+  background-color: #424341;
+  border-radius: 4px;
+`
+
+const withScrollBars = WrappedComponent =>
+  withTheme(props => (
+    <ContainerWithScrollbarsStyle
+      autoHide={true}
+      autoHideTimeout={1000}
+      autoHideDuration={200}
+      thumbMinSize={30}
+      renderThumbHorizontal={({ style, ...props }) => <ScrollBarThumbStyle />}
+      renderThumbVertical={({ style, ...props }) => <ScrollBarThumbStyle />}
+    >
+      {WrappedComponent}
+    </ContainerWithScrollbarsStyle>
+  ))
 
 const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick, theme) => {
   const ComponentWithScrollBars = withScrollBars(component)
@@ -175,105 +207,107 @@ const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderC
   )
 }
 
-export const DockView = withTheme(observer(({ pages, currentPage, onPaneHeaderClick, onResizeEnd, paneSizes, theme }) => {
-  const page = pages[currentPage]
-  if (!page) {
-    console.error(`Dock page ${currentPage} not found`)
-    return null
-  }
+export const DockView = withTheme(
+  observer(({ pages, currentPage, onPaneHeaderClick, onResizeEnd, paneSizes, theme }) => {
+    const page = pages[currentPage]
+    if (!page) {
+      console.error(`Dock page ${currentPage} not found`)
+      return null
+    }
 
-  const { header, panes } = page
+    const { header, panes } = page
 
-  const panesCount = panes.length
+    const panesCount = panes.length
 
-  const makePaneHeaderClickHandler = index => () => {
-    onPaneHeaderClick(currentPage, index)
-  }
+    const makePaneHeaderClickHandler = index => () => {
+      onPaneHeaderClick(currentPage, index)
+    }
 
-  const handleResizeEnd = data => {
-    onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))
-  }
+    const handleResizeEnd = data => {
+      onResizeEnd(currentPage, data.map(item => parseFloat(item) / 100))
+    }
 
-  if (panesCount >= 2) {
-    // если меняется состав открытых\закрытых панелей, то сохраненные значения могут быть нерелевантны
-    // как минимум стоит их тоже занулить если открывается/закрывается какая-то панель!!!
+    if (panesCount >= 2) {
+      // если меняется состав открытых\закрытых панелей, то сохраненные значения могут быть нерелевантны
+      // как минимум стоит их тоже занулить если открывается/закрывается какая-то панель!!!
 
-    const elapsedPanesCount = panes.reduce((accum, { elapsed }) => (elapsed ? accum + 1 : accum), 0)
+      const elapsedPanesCount = panes.reduce((accum, { elapsed }) => (elapsed ? accum + 1 : accum), 0)
 
-    if (elapsedPanesCount >= 2) {
-      let sizes = paneSizes[currentPage].slice()
+      if (elapsedPanesCount >= 2) {
+        let sizes = paneSizes[currentPage].slice()
 
-      // если размеры не определены
-      if (sizes.length === 0) {
-        let firstFoundElapsedPaneIndex = -1
+        // если размеры не определены
+        if (sizes.length === 0) {
+          let firstFoundElapsedPaneIndex = -1
 
-        // формируем дефолтные
-        sizes = panes.map(({ elapsed }, i) => {
-          if (elapsed && firstFoundElapsedPaneIndex === -1) {
-            firstFoundElapsedPaneIndex = i
+          // формируем дефолтные
+          sizes = panes.map(({ elapsed }, i) => {
+            if (elapsed && firstFoundElapsedPaneIndex === -1) {
+              firstFoundElapsedPaneIndex = i
+            }
+
+            if (elapsed) return '144px'
+
+            return '22px'
+          })
+
+          // для первой открытой панели выставляем 100%
+          if (firstFoundElapsedPaneIndex !== -1) {
+            sizes[firstFoundElapsedPaneIndex] = '100%'
           }
-
-          if (elapsed) return '144px'
-
-          return '22px'
-        })
-
-        // для первой открытой панели выставляем 100%
-        if (firstFoundElapsedPaneIndex !== -1) {
-          sizes[firstFoundElapsedPaneIndex] = '100%'
         }
-      }
 
-      return (
-        <DockStyle>
-          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          <SplitPane split="horizontal" allowResize={true} resizerSize={1} onResizeEnd={handleResizeEnd}>
-            {panes.map(({ title, component, elapsed }, i) => {
-              if (elapsed === false) {
-                // return renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
+        return (
+          <DockStyle>
+            {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+            <SplitPane split="horizontal" allowResize={true} resizerSize={1} onResizeEnd={handleResizeEnd}>
+              {panes.map(({ title, component, elapsed }, i) => {
+                if (elapsed === false) {
+                  // return renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
+                  return (
+                    <Pane key={title} initialSize="22px" minSize="22px" maxSize="22px">
+                      {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
+                    </Pane>
+                  )
+                }
+
+                // const initialSize = sizes[i] == null ? '144px' : sizes[i]
+
                 return (
-                  <Pane key={title} initialSize="22px" minSize="22px" maxSize="22px">
+                  <Pane key={title} initialSize={sizes[i]} minSize="144px" maxSize="100%">
                     {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
                   </Pane>
                 )
-              }
+              })}
+            </SplitPane>
+          </DockStyle>
+        )
+      } else {
+        return (
+          <DockStyle>
+            {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+            {panes.map(({ title, component, elapsed }, i) =>
+              renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)
+            )}
+          </DockStyle>
+        )
+      }
+    }
 
-              // const initialSize = sizes[i] == null ? '144px' : sizes[i]
+    if (panesCount === 1) {
+      const [{ title, component, elapsed }] = panes
 
-              return (
-                <Pane key={title} initialSize={sizes[i]} minSize="144px" maxSize="100%">
-                  {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
-                </Pane>
-              )
-            })}
-          </SplitPane>
-        </DockStyle>
-      )
-    } else {
       return (
         <DockStyle>
           {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          {panes.map(({ title, component, elapsed }, i) =>
-            renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)
-          )}
+          {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0), theme)}
         </DockStyle>
       )
     }
-  }
 
-  if (panesCount === 1) {
-    const [{ title, component, elapsed }] = panes
-
-    return (
-      <DockStyle>
-        {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-        {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0), theme)}
-      </DockStyle>
-    )
-  }
-
-  return <DockStyle>{!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}</DockStyle>
-}))
+    return <DockStyle>{!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}</DockStyle>
+  })
+)
 
 const TextStyle = styled.p`
   color: '#c3c3c3';

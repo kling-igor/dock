@@ -52,7 +52,7 @@ html {
 `
 
 const workspace = {
-  openProject: () => { }
+  openProject: () => {}
 }
 
 const dock = new Dock({ workspace })
@@ -66,7 +66,7 @@ export default class App extends Component {
       <ThemeProvider theme={light}>
         <>
           <GlobalStyle />
-          <SplitPane split="vertical" allowResize={true} resizerSize={1}>
+          <SplitPane split="vertical" allowResize={true}>
             <Pane initialSize="10%" minSize="200px" maxSize="350px">
               <Dock />
             </Pane>

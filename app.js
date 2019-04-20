@@ -182,6 +182,20 @@ export default class App extends Component {
     })
   }
 
+
+  addPane = () => {
+    dock.addPane('explorer', {
+      title: 'NO FOLDER OPENED 2',
+      elapsed: true,
+      component: <OpenFolder workspace={workspace} />,
+      paneHeaderButtons: []
+    })
+  }
+
+  removePane = () => {
+    dock.removePane('explorer', 1)
+  }
+
   render() {
     const Dock = dock.widget
 
@@ -189,6 +203,8 @@ export default class App extends Component {
       {!this.state.dockInited && <button onClick={this.initDock}>Init Dock Panes</button>}
       {this.state.dockInited && <button onClick={() => dock.showPage('explorer')}>EXPOLORER</button>}
       {this.state.dockInited && <button onClick={() => dock.showPage('search')}>SEARCH</button>}
+      {this.state.dockInited && <button onClick={this.addPane}>Add Pane Add Index 1</button>}
+      {this.state.dockInited && <button onClick={this.removePane}>Remove Pane Add Index 1</button>}
     </div>
 
     return (

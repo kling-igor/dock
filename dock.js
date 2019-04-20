@@ -10,47 +10,17 @@ export class Dock {
 
   @observable currentPage = null
 
+  paneSizes = {
+    explorer: [],
+    search: []
+  }
+
+
   // для каждой страницы для каждого раздела страницы сохраняются размеры
   paneSizes = {}
 
-  // @action.bound addToTopPanel({ title, component }) {
-  //   this.panels = [{ title, component }, ...this.panels]
-  // }
-
-  // @action.bound addToBottomPanel({ title, component }) {
-  //   this.panels = [...this.panels, { title, component }]
-  // }
-
-  // @action.bound removePanelWithName(name) {
-  //   this.panels = this.panels.filter(({ title }) => title !== name)
-  //   // TODO: если нет панели OUTLINE то добавить снизу дефолтную 'OUTLINE'
-
-  //   // если только одна панель OUTLINE то добавить сверху дефолтную 'NO FOLDER OPENED'
-  // }
 
   constructor({ workspace, project } = {}) {
-    this.pages = {
-      // explorer: {
-      //   header: 'EXPLORER',
-      //   panes: [
-      //     { title: 'NO FOLDER OPENED', elapsed: true, component: <OpenFolder workspace={workspace} /> },
-      //     { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> },
-      //     { title: 'VARIABLES', elapsed: true, component: <div>HELLO</div> }
-      //   ]
-      // },
-      // search: {
-      //   header: 'SEARCH',
-      //   panes: [{ component: <SearchInfo /> }]
-      // }
-    }
-
-    this.paneSizes = {
-      explorer: [],
-      search: []
-    }
-
-    this.currentPage = ''//'search'
-
     this._widget = observer(() => (
       <DockView
         currentPage={this.currentPage}
@@ -91,6 +61,32 @@ export class Dock {
   @action.bound
   removePage(pageId) {
     delete this.pages[pageId]
+  }
+
+
+  @action.bound
+  addPane(pageId, description) {
+    const page = this.pages[pageId]
+    if (page) {
+      this.paneSizes[pageId] = []
+      page.panes = [...page.panes, description]
+      this.pages = { ...this.pages }
+    }
+  }
+
+  @action.bound
+  insertPane(pageId, index, description) {
+
+  }
+
+  @action.bound
+  removePane(pageId, index) {
+    const page = this.pages[pageId]
+    if (page && page.panes.length > index) {
+      this.paneSizes[pageId] = []
+      page.panes = [...page.panes.slice(0, index), ...page.panes.slice(index + 1)]
+      this.pages = { ...this.pages }
+    }
   }
 
   @computed get widget() {

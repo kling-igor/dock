@@ -1,11 +1,9 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
-// import Split from 'react-split'
-import SplitPane, { Pane } from './react-split'
-
 import { Scrollbars } from 'react-custom-scrollbars'
 import { observer } from 'mobx-react'
-import { Button, Intent } from '@blueprintjs/core'
+
+import SplitPane, { Pane } from './react-split'
 
 /**
  * Контейнер дока
@@ -16,26 +14,26 @@ const DockStyle = styled.div`
   width: 100%;
   height: 100%; /*!!header ? 'calc(100% - 35px)' : '100%',*/
   background-color: ${({
-    theme: {
-      sideBar: { background }
-    }
-  }) => (background ? background : '#f0f')};
+  theme: {
+    sideBar: { background }
+  }
+}) => (background ? background : '#f0f')};
   overflow: auto;
   border-right-color: ${({
-    theme: {
-      sideBar: { border, background }
-    }
-  }) => (border ? border : background)};
+  theme: {
+    sideBar: { border, background }
+  }
+}) => (border ? border : background)};
   border-right-style: ${({
-    theme: {
-      sideBar: { border }
-    }
-  }) => (border ? 'solid' : 'none')};
+  theme: {
+    sideBar: { border }
+  }
+}) => (border ? 'solid' : 'none')};
   border-right-width: ${({
-    theme: {
-      sideBar: { border }
-    }
-  }) => (border ? '1px' : '0px')};
+  theme: {
+    sideBar: { border }
+  }
+}) => (border ? '1px' : '0px')};
 `
 
 /**
@@ -45,7 +43,7 @@ const DockHeaderStyle = styled.div`
   -webkit-app-region: no-drag;
   -webkit-touch-callout: none;
   user-select: none;
-  pointer-events: none;
+  /* pointer-events: none; */
 
   overflow: hidden;
 
@@ -59,22 +57,22 @@ const DockHeaderStyle = styled.div`
   padding-left: 20px;
 
   display: flex;
-  justify-content: flex-start; /*space-between; */
+  justify-content: space-between;
   align-items: center;
 
   background-color: ${({
-    theme: {
-      sideBar: { background }
-    }
-  }) => (background ? background : '#f00')};
+  theme: {
+    sideBar: { background }
+  }
+}) => (background ? background : '#f00')};
   font-size: 11px;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 0px;
   color: ${({
-    theme: {
-      sideBarTitle: { foreground }
-    }
-  }) => foreground || '#ffff00'};
+  theme: {
+    sideBarTitle: { foreground }
+  }
+}) => foreground || '#ffff00'};
 `
 
 /**
@@ -93,23 +91,23 @@ const DockPaneHeaderStyle = styled.div`
   width: 100%;
 
   display: flex;
-  justify-content: flex-start; /*space-between; */
+  justify-content: space-between;
   align-items: center;
 
   background-color: ${({
-    theme: {
-      sideBarSectionHeader: { background }
-    }
-  }) => background || '#ff00ff'};
+  theme: {
+    sideBarSectionHeader: { background }
+  }
+}) => background || '#ff00ff'};
   font-size: 11px;
   font-weight: bold;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 0px;
   color: ${({
-    theme: {
-      sideBarSectionHeader: { foreground }
-    }
-  }) => foreground || '#ffff00'};
+  theme: {
+    sideBarSectionHeader: { foreground }
+  }
+}) => foreground || '#ffff00'};
 `
 
 /**
@@ -117,10 +115,10 @@ const DockPaneHeaderStyle = styled.div`
  */
 const DockHeaderArrowStyle = styled.span`
   color: ${({
-    theme: {
-      sideBar: { foreground }
-    }
-  }) => foreground || '#00ffff'};
+  theme: {
+    sideBar: { foreground }
+  }
+}) => foreground || '#00ffff'};
   margin-right: 7px;
   margin-left: 7px;
   display: inline-block;
@@ -131,6 +129,12 @@ const DockHeaderArrowStyle = styled.span`
     content: '▾';
   }
 `
+
+const DockPaneHeaderButtonStyle = styled.img`
+  margin-left: 8px;
+  margin-right: 8px;
+`
+
 
 /**
  * Секция страницы дока
@@ -143,24 +147,59 @@ const DockPaneStyle = styled.div`
   overflow: ${({ elapsed }) => (elapsed ? 'auto' : 'hidden')};
 `
 
-const DockPane = ({ theme, elapsed, onHeaderClick, title, children }) => (
-  <DockPaneStyle className={theme.type === 'dark' ? 'bp3-dark' : ''} elapsed={elapsed}>
-    <DockPaneHeaderStyle onClick={onHeaderClick}>
-      <DockHeaderArrowStyle elapsed={elapsed} theme={theme} />
-      {title}
-    </DockPaneHeaderStyle>
-    {children}
-  </DockPaneStyle>
-)
+const LeftAlignedBlock = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`
+
+const RightAlignedBlock = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`
+
+const svgThemedName = (theme, path) => {
+  if (theme.type === 'dark') {
+    return path.substring(0, path.lastIndexOf(".")) + "-dark" + path.substring(path.lastIndexOf("."));
+  }
+
+  return path
+}
+
+const DockPane = ({ headerButtons = [], theme, elapsed, onHeaderClick, title, children }) => {
+  return (
+    <DockPaneStyle className={theme.type === 'dark' ? 'bp3-dark' : ''} elapsed={elapsed}>
+      <DockPaneHeaderStyle onClick={onHeaderClick}>
+        <LeftAlignedBlock>
+          <DockHeaderArrowStyle elapsed={elapsed} theme={theme} />
+          {title}
+        </LeftAlignedBlock>
+        <RightAlignedBlock>
+          {headerButtons.map(({ icon, onClick, tooltip }) => {
+            const onClickHandler = event => {
+              event.preventDefault()
+              event.stopPropagation()
+              onClick()
+            }
+            return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+          })}
+        </RightAlignedBlock>
+
+      </DockPaneHeaderStyle>
+      {children}
+    </DockPaneStyle >
+  )
+}
 
 const ContainerWithScrollbarsStyle = styled(Scrollbars)`
   width: 100%;
   height: 100%;
   background: ${({
-    theme: {
-      sideBar: { background }
-    }
-  }) => background};
+  theme: {
+    sideBar: { background }
+  }
+}) => background};
   overflow: hidden;
 `
 
@@ -183,7 +222,7 @@ const withScrollBars = WrappedComponent =>
     </ContainerWithScrollbarsStyle>
   ))
 
-const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick, theme) => {
+const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderClick, theme, paneHeaderButtons) => {
   const ComponentWithScrollBars = withScrollBars(component)
 
   if (!title) {
@@ -195,12 +234,12 @@ const renderDockPane = (title, component, elapsed, offset = 0, handlePaneHeaderC
   }
 
   if (elapsed === false) {
-    return <DockPane key={title} title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} theme={theme} />
+    return <DockPane key={title} title={title} elapsed={false} onHeaderClick={handlePaneHeaderClick} theme={theme} headerButtons={paneHeaderButtons} />
   }
 
   return (
     <div key={title} style={{ height: `calc(100% - ${offset}px)`, width: '100%', overflow: 'hidden' }}>
-      <DockPane title={title} elapsed={true} onHeaderClick={handlePaneHeaderClick} theme={theme}>
+      <DockPane title={title} elapsed={true} onHeaderClick={handlePaneHeaderClick} theme={theme} headerButtons={paneHeaderButtons}>
         <ComponentWithScrollBars />
       </DockPane>
     </div>
@@ -215,7 +254,7 @@ export const DockView = withTheme(
       return null
     }
 
-    const { header, panes } = page
+    const { pageTitle, panes, pageHeaderButtons } = page
 
     const panesCount = panes.length
 
@@ -259,14 +298,26 @@ export const DockView = withTheme(
 
         return (
           <DockStyle>
-            {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
+            <DockHeaderStyle>
+              <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+              <RightAlignedBlock>
+                {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
+                  const onClickHandler = event => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onClick()
+                  }
+                  return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+                })}
+              </RightAlignedBlock>
+            </DockHeaderStyle>
             <SplitPane split="horizontal" allowResize={true} resizerSize={1} onResizeEnd={handleResizeEnd}>
-              {panes.map(({ title, component, elapsed }, i) => {
+              {panes.map(({ title, component, elapsed, paneHeaderButtons }, i) => {
                 if (elapsed === false) {
                   // return renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i))
                   return (
                     <Pane key={title} initialSize="22px" minSize="22px" maxSize="22px">
-                      {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
+                      {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme, paneHeaderButtons)}
                     </Pane>
                   )
                 }
@@ -275,7 +326,7 @@ export const DockView = withTheme(
 
                 return (
                   <Pane key={title} initialSize={sizes[i]} minSize="144px" maxSize="100%">
-                    {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)}
+                    {renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme, paneHeaderButtons)}
                   </Pane>
                 )
               })}
@@ -285,9 +336,21 @@ export const DockView = withTheme(
       } else {
         return (
           <DockStyle>
-            {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-            {panes.map(({ title, component, elapsed }, i) =>
-              renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme)
+            <DockHeaderStyle>
+              <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+              <RightAlignedBlock>
+                {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
+                  const onClickHandler = event => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onClick()
+                  }
+                  return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+                })}
+              </RightAlignedBlock>
+            </DockHeaderStyle>
+            {panes.map(({ title, component, elapsed, paneHeaderButtons }, i) =>
+              renderDockPane(title, component, elapsed, 0, makePaneHeaderClickHandler(i), theme, paneHeaderButtons)
             )}
           </DockStyle>
         )
@@ -295,60 +358,28 @@ export const DockView = withTheme(
     }
 
     if (panesCount === 1) {
-      const [{ title, component, elapsed }] = panes
+      const [{ title, component, elapsed, paneHeaderButtons }] = panes
 
       return (
         <DockStyle>
-          {!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}
-          {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0), theme)}
+          <DockHeaderStyle>
+            <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+            <RightAlignedBlock>
+              {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
+                const onClickHandler = event => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  onClick()
+                }
+                return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+              })}
+            </RightAlignedBlock>
+          </DockHeaderStyle>
+          {renderDockPane(title, component, elapsed, 35 /*offset*/, makePaneHeaderClickHandler(0), theme, paneHeaderButtons)}
         </DockStyle>
       )
     }
 
-    return <DockStyle>{!!header && <DockHeaderStyle>{header}</DockHeaderStyle>}</DockStyle>
+    return <DockStyle>{!!pageTitle && <DockHeaderStyle>{pageTitle}</DockHeaderStyle>}</DockStyle>
   })
 )
-
-const TextStyle = styled.p`
-  color: '#c3c3c3';
-  user-select: none;
-  pointer-events: none;
-`
-
-const ContainerStyle = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-top: 16px;
-`
-
-export const OpenFolder = withTheme(({ workspace }) => (
-  <ContainerStyle>
-    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">You have not yet opened a folder</TextStyle>
-    <Button
-      small
-      intent={Intent.PRIMARY}
-      onClick={workspace.openProject}
-      style={{ borderRadius: '0px', width: '100%' }}
-    >
-      Open Folder
-    </Button>
-  </ContainerStyle>
-))
-
-export const OutlineInfo = withTheme(() => (
-  <ContainerStyle>
-    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">
-      There are no editors open that can provide outline information.
-    </TextStyle>
-  </ContainerStyle>
-))
-
-export const SearchInfo = withTheme(() => (
-  <ContainerStyle>
-    <TextStyle className="bp3-ui-text bp3-text-small bp3-text-muted">FAKE SEARCH INFO!!!</TextStyle>
-  </ContainerStyle>
-))

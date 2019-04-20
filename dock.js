@@ -30,18 +30,18 @@ export class Dock {
 
   constructor({ workspace, project } = {}) {
     this.pages = {
-      explorer: {
-        header: 'EXPLORER',
-        panes: [
-          { title: 'NO FOLDER OPENED', elapsed: true, component: <OpenFolder workspace={workspace} /> },
-          { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> },
-          { title: 'VARIABLES', elapsed: true, component: <div>HELLO</div> }
-        ]
-      },
-      search: {
-        header: 'SEARCH',
-        panes: [{ component: <SearchInfo /> }]
-      }
+      // explorer: {
+      //   header: 'EXPLORER',
+      //   panes: [
+      //     { title: 'NO FOLDER OPENED', elapsed: true, component: <OpenFolder workspace={workspace} /> },
+      //     { title: 'OUTLINE', elapsed: true, component: <OutlineInfo /> },
+      //     { title: 'VARIABLES', elapsed: true, component: <div>HELLO</div> }
+      //   ]
+      // },
+      // search: {
+      //   header: 'SEARCH',
+      //   panes: [{ component: <SearchInfo /> }]
+      // }
     }
 
     this.paneSizes = {
@@ -49,7 +49,7 @@ export class Dock {
       search: []
     }
 
-    this.currentPage = 'search'
+    this.currentPage = ''//'search'
 
     this._widget = observer(() => (
       <DockView
@@ -81,6 +81,16 @@ export class Dock {
     if (pageId in this.pages) {
       this.currentPage = pageId
     }
+  }
+
+  @action.bound
+  addPage(pageId, description) {
+    this.pages = { ...this.pages, [pageId]: description }
+  }
+
+  @action.bound
+  removePage(pageId) {
+    delete this.pages[pageId]
   }
 
   @computed get widget() {

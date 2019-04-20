@@ -187,8 +187,8 @@ export default class App extends Component {
 
     const ControlPage = () => <div style={{ height: '100%', width: '100%', backgroundColor: '#343434' }}>
       {!this.state.dockInited && <button onClick={this.initDock}>Init Dock Panes</button>}
-      <button onClick={() => dock.showPage('explorer')}>EXPOLORER</button>
-      <button onClick={() => dock.showPage('search')}>SEARCH</button>
+      {this.state.dockInited && <button onClick={() => dock.showPage('explorer')}>EXPOLORER</button>}
+      {this.state.dockInited && <button onClick={() => dock.showPage('search')}>SEARCH</button>}
     </div>
 
     return (

@@ -5,6 +5,13 @@ import { observer } from 'mobx-react'
 
 import SplitPane, { Pane } from './react-split'
 
+const UnselectableStyle = styled.div`
+  -webkit-app-region: no-drag;
+  -webkit-touch-callout: none;
+  user-select: none;
+  pointer-events: none;
+`
+
 /**
  * Контейнер дока
  */
@@ -40,11 +47,6 @@ const DockStyle = styled.div`
  * Заголовок страницы дока
  */
 const DockHeaderStyle = styled.div`
-  -webkit-app-region: no-drag;
-  -webkit-touch-callout: none;
-  user-select: none;
-  /* pointer-events: none; */
-
   overflow: hidden;
 
   position: relative;
@@ -79,8 +81,6 @@ const DockHeaderStyle = styled.div`
  * Заголовок секции страницы дока
  */
 const DockPaneHeaderStyle = styled.div`
-  user-select: none;
-
   overflow: hidden;
 
   position: relative;
@@ -114,6 +114,11 @@ const DockPaneHeaderStyle = styled.div`
  * Стрелка раскрытия секции страницы дока
  */
 const DockHeaderArrowStyle = styled.span`
+  -webkit-app-region: no-drag;
+  -webkit-touch-callout: none;
+  user-select: none;
+  pointer-events: none;
+
   color: ${({
   theme: {
     sideBar: { foreground }
@@ -130,7 +135,10 @@ const DockHeaderArrowStyle = styled.span`
   }
 `
 
-const DockPaneHeaderButtonStyle = styled.img`
+const DockHeaderButtonStyle = styled.img`
+  -webkit-app-region: no-drag;
+  -webkit-touch-callout: none;
+  user-select: none;
   margin-left: 8px;
   margin-right: 8px;
 `
@@ -173,7 +181,7 @@ const DockPane = ({ headerButtons = [], theme, elapsed, onHeaderClick, title, ch
       <DockPaneHeaderStyle onClick={onHeaderClick}>
         <LeftAlignedBlock>
           <DockHeaderArrowStyle elapsed={elapsed} theme={theme} />
-          {title}
+          <UnselectableStyle>{title}</UnselectableStyle>
         </LeftAlignedBlock>
         <RightAlignedBlock>
           {headerButtons.map(({ icon, onClick, tooltip }) => {
@@ -182,7 +190,7 @@ const DockPane = ({ headerButtons = [], theme, elapsed, onHeaderClick, title, ch
               event.stopPropagation()
               onClick()
             }
-            return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+            return <DockHeaderButtonStyle key={icon} draggable={false} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
           })}
         </RightAlignedBlock>
 
@@ -299,7 +307,9 @@ export const DockView = withTheme(
         return (
           <DockStyle>
             <DockHeaderStyle>
-              <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+              <LeftAlignedBlock>
+                {!!pageTitle && <UnselectableStyle>{pageTitle}</UnselectableStyle>}
+              </LeftAlignedBlock>
               <RightAlignedBlock>
                 {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
                   const onClickHandler = event => {
@@ -307,7 +317,7 @@ export const DockView = withTheme(
                     event.stopPropagation()
                     onClick()
                   }
-                  return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+                  return <DockHeaderButtonStyle key={icon} draggable={false} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
                 })}
               </RightAlignedBlock>
             </DockHeaderStyle>
@@ -337,7 +347,9 @@ export const DockView = withTheme(
         return (
           <DockStyle>
             <DockHeaderStyle>
-              <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+              <LeftAlignedBlock>
+                {!!pageTitle && <UnselectableStyle>{pageTitle}</UnselectableStyle>}
+              </LeftAlignedBlock>
               <RightAlignedBlock>
                 {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
                   const onClickHandler = event => {
@@ -345,7 +357,7 @@ export const DockView = withTheme(
                     event.stopPropagation()
                     onClick()
                   }
-                  return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+                  return <DockHeaderButtonStyle key={icon} draggable={false} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
                 })}
               </RightAlignedBlock>
             </DockHeaderStyle>
@@ -363,7 +375,9 @@ export const DockView = withTheme(
       return (
         <DockStyle>
           <DockHeaderStyle>
-            <LeftAlignedBlock>{!!pageTitle && pageTitle}</LeftAlignedBlock>
+            <LeftAlignedBlock>
+              {!!pageTitle && <UnselectableStyle>{pageTitle}</UnselectableStyle>}
+            </LeftAlignedBlock>
             <RightAlignedBlock>
               {pageHeaderButtons.map(({ icon, onClick, tooltip }) => {
                 const onClickHandler = event => {
@@ -371,7 +385,7 @@ export const DockView = withTheme(
                   event.stopPropagation()
                   onClick()
                 }
-                return <DockPaneHeaderButtonStyle key={icon} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
+                return <DockHeaderButtonStyle key={icon} draggable={false} src={svgThemedName(theme, icon)} width={16} height={16} onClick={onClickHandler} />
               })}
             </RightAlignedBlock>
           </DockHeaderStyle>
